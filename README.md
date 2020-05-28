@@ -1,2 +1,2 @@
-# dotfiles
-Contains dotfiles which are customised such as vimrc
+# Dotfiles
+Contains dotfiles which I have customised.
