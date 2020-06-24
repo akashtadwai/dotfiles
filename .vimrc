@@ -1,221 +1,165 @@
-set nocompatible " not vi compatible
+syntax on
+let g:coc_disable_startup_warning = 1
+set guicursor=
+set noshowmatch
+set relativenumber
+set nohlsearch
+set hidden
+set noerrorbells
+set tabstop=4 softtabstop=4
+set shiftwidth=4
+set expandtab
+set smartindent
+set nu
+set nowrap
+set smartcase
+set noswapfile
+set nobackup
+set undodir=~/.vim/undodir
+set undofile
+set incsearch
+set termguicolors
+set scrolloff=8
 
-"------------------
-" Syntax and indent
-"------------------
-syntax on " turn on syntax highlighting
-set showmatch " show matching braces when text indicator is over them
+" Give more space for displaying messages.
+set cmdheight=2
 
-" highlight current line, but only in active window
-augroup CursorLineOnlyInActiveWindow
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=50
+
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
+set colorcolumn=80
+highlight ColorColumn ctermbg=0 guibg=lightgrey
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'tweekmonster/gofmt.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'vim-utils/vim-man'
+Plug 'mbbill/undotree'
+Plug 'sheerun/vim-polyglot'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'gruvbox-community/gruvbox'
+Plug 'sainnhe/gruvbox-material'
+Plug 'phanviet/vim-monokai-pro'
+Plug 'vim-airline/vim-airline'
+Plug 'flazz/vim-colorschemes'
+Plug '/home/mpaulson/personal/vim-be-good'
+
+call plug#end()
+
+let g:gruvbox_contrast_dark = 'hard'
+if exists('+termguicolors')
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+endif
+let g:gruvbox_invert_selection='0'
+
+
+" --- vim go (polyglot) settings.
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_types = 1
+let g:go_highlight_function_parameters = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_generate_tags = 1
+let g:go_highlight_format_strings = 1
+let g:go_highlight_variable_declarations = 1
+let g:go_auto_sameids = 1
+
+colorscheme gruvbox
+set background=dark
+
+if executable('rg')
+    let g:rg_derive_root='true'
+endif
+
+let loaded_matchparen = 1
+let mapleader = " "
+
+let g:netrw_browse_split = 2
+let g:vrfr_rg = 'true'
+let g:netrw_banner = 0
+let g:netrw_winsize = 25
+
+nnoremap <leader>pw :Rg <C-R>=expand("<cword>")<CR><CR>
+nnoremap <leader>phw :h <C-R>=expand("<cword>")<CR><CR>
+nnoremap <leader>h :wincmd h<CR>
+nnoremap <leader>j :wincmd j<CR>
+nnoremap <leader>k :wincmd k<CR>
+nnoremap <leader>l :wincmd l<CR>
+nnoremap <leader>u :UndotreeShow<CR>
+nnoremap <leader>pv :wincmd v<bar> :Ex <bar> :vertical resize 30<CR>
+nnoremap <Leader>ps :Rg<SPACE>
+nnoremap <C-p> :GFiles<CR>
+nnoremap <Leader>pf :Files<CR>
+nnoremap <Leader><CR> :so ~/.config/nvim/init.vim<CR>
+nnoremap <Leader>+ :vertical resize +5<CR>
+nnoremap <Leader>- :vertical resize -5<CR>
+nnoremap <Leader>rp :resize 100<CR>
+nnoremap <Leader>ee oif err != nil {<CR>log.Fatalf("%+v\n", err)<CR>}<CR><esc>kkI<esc>
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Vim with me
+nnoremap <leader>vwm :colorscheme gruvbox<bar>:set background=dark<CR>
+nmap <leader>vtm :highlight Pmenu ctermbg=gray guibg=gray
+
+vnoremap X "_d
+inoremap <C-c> <esc>
+
+function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <TAB>
+            \ pumvisible() ? "\<C-n>" :
+            \ <SID>check_back_space() ? "\<TAB>" :
+            \ coc#refresh()
+
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <silent><expr> <C-space> coc#refresh()
+
+" GoTo code navigation.
+nmap <leader>gd <Plug>(coc-definition)
+nmap <leader>gy <Plug>(coc-type-definition)
+nmap <leader>gi <Plug>(coc-implementation)
+nmap <leader>gr <Plug>(coc-references)
+nmap <leader>rr <Plug>(coc-rename)
+nmap <leader>g[ <Plug>(coc-diagnostic-prev)
+nmap <leader>g] <Plug>(coc-diagnostic-next)
+nmap <silent> <leader>gp <Plug>(coc-diagnostic-prev-error)
+nmap <silent> <leader>gn <Plug>(coc-diagnostic-next-error)
+nnoremap <leader>cr :CocRestart
+
+nmap <leader>gh :diffget //3<CR>
+nmap <leader>gu :diffget //2<CR>
+nmap <leader>gs :G<CR>
+
+fun! TrimWhitespace()
+    let l:save = winsaveview()
+    keeppatterns %s/\s\+$//e
+    call winrestview(l:save)
+endfun
+
+augroup highlight_yank
     autocmd!
-    autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
-    autocmd WinLeave * setlocal nocursorline
+    autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank("IncSearch", 50)
 augroup END
 
-" vim can autodetect this based on $TERM (e.g. 'xterm-256color')
-" but it can be set to force 256 colors
-" set t_Co=256
-if has('gui_running')
-    colorscheme default 
-    let g:lightline = {'colorscheme': 'solarized'}
-elseif &t_Co < 256
-    colorscheme default
-    set nocursorline " looks bad in this mode
-else
-    set background=dark
-    let g:solarized_termcolors=256 " instead of 16 color with mapping in terminal
-    colorscheme default 
-    " customized colors
-    highlight SignColumn ctermbg=234
-    highlight StatusLine cterm=bold ctermfg=245 ctermbg=235
-    highlight StatusLineNC cterm=bold ctermfg=245 ctermbg=235
-    let g:lightline = {'colorscheme': 'dark'}
-    highlight SpellBad cterm=underline
-    " patches
-    highlight CursorLineNr cterm=NONE
-endif
-
-filetype plugin indent on " enable file type detection
-set autoindent
-
-"---------------------
-" Basic editing config
-"---------------------
-set shortmess+=I " disable startup message
-set nu " number lines
-set rnu " relative line numbering
-set incsearch " incremental search (as string is being typed)
-set hls " highlight search
-set listchars=tab:>>,nbsp:~ " set list to see tabs and non-breakable spaces
-set lbr " line break
-set scrolloff=5 " show lines above and below cursor (when possible)
-set noshowmode " hide mode
-set laststatus=2
-set backspace=indent,eol,start " allow backspacing over everything
-set timeout timeoutlen=1000 ttimeoutlen=100 " fix slow O inserts
-set lazyredraw " skip redrawing screen in some cases
-set autochdir " automatically set current directory to directory of last opened file
-set hidden " allow auto-hiding of edited buffers
-set history=8192 " more history
-set nojoinspaces " suppress inserting two spaces between sentences
-" use 4 spaces instead of tabs during formatting
-set expandtab
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
-" smart case-sensitive search
-set ignorecase
-set smartcase
-" tab completion for files/bufferss
-set wildmode=longest,list
+autocmd BufWritePre * :call TrimWhitespace()
+:imap kj <Esc>
+set wildmode=longest,list,full
 set wildmenu
-set mouse+=a " enable mouse mode (scrolling, selection, etc)
-if &term =~ '^screen'
-    " tmux knows the extended mouse mode
-    set ttymouse=xterm2
-endif
-
-"--------------------
-" Misc configurations
-"--------------------
-
-" unbind keys
-map <C-a> <Nop>
-map <C-x> <Nop>
-nmap Q <Nop>
-
-" disable audible bell
-set noerrorbells visualbell t_vb=
-
-" open new split panes to right and bottom, which feels more natural
-set splitbelow
-set splitright
-
-" quicker window movement
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-h> <C-w>h
-nnoremap <C-l> <C-w>l
-
-" movement relative to display lines
-nnoremap <silent> <Leader>d :call ToggleMovementByDisplayLines()<CR>
-function SetMovementByDisplayLines()
-    noremap <buffer> <silent> <expr> k v:count ? 'k' : 'gk'
-    noremap <buffer> <silent> <expr> j v:count ? 'j' : 'gj'
-    noremap <buffer> <silent> 0 g0
-    noremap <buffer> <silent> $ g$
-endfunction
-function ToggleMovementByDisplayLines()
-    if !exists('b:movement_by_display_lines')
-        let b:movement_by_display_lines = 0
-    endif
-    if b:movement_by_display_lines
-        let b:movement_by_display_lines = 0
-        silent! nunmap <buffer> k
-        silent! nunmap <buffer> j
-        silent! nunmap <buffer> 0
-        silent! nunmap <buffer> $
-    else
-        let b:movement_by_display_lines = 1
-        call SetMovementByDisplayLines()
-    endif
-endfunction
-
-" toggle relative numbering
-nnoremap <C-n> :set rnu!<CR>
-
-" save read-only files
-command -nargs=0 Sudow w !sudo tee % >/dev/null
-
-"---------------------
-" Plugin configuration
-"---------------------
-
-" nerdtree
-nnoremap <Leader>n :NERDTreeToggle<CR>
-nnoremap <Leader>f :NERDTreeFind<CR>
-
-" buffergator
-let g:buffergator_suppress_keymaps = 1
-nnoremap <Leader>b :BuffergatorToggle<CR>
-
-" gundo
-nnoremap <Leader>u :GundoToggle<CR>
-if has('python3')
-    let g:gundo_prefer_python3 = 1
-endif
-
-" ctrlp
-nnoremap ; :CtrlPBuffer<CR>
-let g:ctrlp_switch_buffer = 0
-let g:ctrlp_show_hidden = 1
-
-" ag / ack.vim
-command -nargs=+ Gag Gcd | Ack! <args>
-nnoremap K :Gag "\b<C-R><C-W>\b"<CR>:cw<CR>
-if executable('ag')
-    let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
-    let g:ackprg = 'ag --vimgrep'
-endif
-
-" syntastic
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_mode_map = {
-    \ 'mode': 'passive',
-    \ 'active_filetypes': [],
-    \ 'passive_filetypes': []
-\}
-nnoremap <Leader>s :SyntasticCheck<CR>
-nnoremap <Leader>r :SyntasticReset<CR>
-nnoremap <Leader>i :SyntasticInfo<CR>
-nnoremap <Leader>m :SyntasticToggleMode<CR>
-
-" easymotion
-map <Space> <Plug>(easymotion-prefix)
-
-" incsearch
-map / <Plug>(incsearch-forward)
-map ? <Plug>(incsearch-backward)
-map g/ <Plug>(incsearch-stay)
-
-" incsearch-easymotion
-map z/ <Plug>(incsearch-easymotion-/)
-map z? <Plug>(incsearch-easymotion-?)
-map zg/ <Plug>(incsearch-easymotion-stay)
-
-" argwrap
-nnoremap <Leader>w :ArgWrap<CR>
-
-noremap <Leader>x :OverCommandLine<CR>
-
-" markdown
-let g:markdown_fenced_languages = [
-    \ 'bash=sh',
-    \ 'c',
-    \ 'coffee',
-    \ 'erb=eruby',
-    \ 'javascript',
-    \ 'json',
-    \ 'perl',
-    \ 'python',
-    \ 'ruby',
-    \ 'yaml',
-    \ 'go',
-\]
-let g:markdown_syntax_conceal = 0
-
-" fugitive
-set tags^=.git/tags;~
-
-"---------------------
-" Local customizations
-"---------------------
-
-" local customizations in ~/.vimrc_local
-let $LOCALFILE=expand("~/.vimrc_local")
-if filereadable($LOCALFILE)
-    source $LOCALFILE
-endif
