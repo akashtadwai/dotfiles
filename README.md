@@ -1,2 +1,2 @@
 # Dotfiles
-Contains dotfiles which I have customised.
+Dotfiles that I use on my PC
